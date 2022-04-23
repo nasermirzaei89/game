@@ -4,9 +4,9 @@ import (
 	"github.com/nasermirzaei89/td/internal/components"
 )
 
-type Player struct {
+type BatBrain struct {
 	components.Position
 	components.MovementControl
-	components.Character
+	components.Animation
 	components.Wrapable
 }

@@ -1,4 +1,4 @@
-package actors
+package systems
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
@@ -6,15 +6,17 @@ import (
 	"github.com/nasermirzaei89/td/internal/engine"
 )
 
-type Transporter interface {
+type Transportable interface {
 	GetPosition() *components.Position
 	GetVelocity() *components.Velocity
 }
 
-type Transport struct{}
+type Transporter struct{}
 
-func (t *Transport) Update(obj engine.Object) error {
-	entity, ok := obj.(Transporter)
+var _ engine.System = new(Transporter)
+
+func (t *Transporter) Update(obj engine.Entity) error {
+	entity, ok := obj.(Transportable)
 	if !ok {
 		return nil
 	}
@@ -28,6 +30,4 @@ func (t *Transport) Update(obj engine.Object) error {
 	return nil
 }
 
-func (t *Transport) Draw(obj engine.Object, screen *ebiten.Image) {}
-
-var _ engine.Actor = new(Transport)
+func (t *Transporter) Draw(obj engine.Entity, screen *ebiten.Image) {}

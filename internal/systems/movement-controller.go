@@ -1,4 +1,4 @@
-package actors
+package systems
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
@@ -6,15 +6,17 @@ import (
 	"github.com/nasermirzaei89/td/internal/engine"
 )
 
-type MovementController interface {
+type MovementControllable interface {
 	GetPosition() *components.Position
 	GetMovementControl() *components.MovementControl
 }
 
-type MovementControl struct{}
+type MovementController struct{}
 
-func (mc *MovementControl) Update(obj engine.Object) error {
-	entity, ok := obj.(MovementController)
+var _ engine.System = new(MovementController)
+
+func (mc *MovementController) Update(obj engine.Entity) error {
+	entity, ok := obj.(MovementControllable)
 	if !ok {
 		return nil
 	}
@@ -41,6 +43,4 @@ func (mc *MovementControl) Update(obj engine.Object) error {
 	return nil
 }
 
-func (mc *MovementControl) Draw(obj engine.Object, screen *ebiten.Image) {}
-
-var _ engine.Actor = new(MovementControl)
+func (mc *MovementController) Draw(obj engine.Entity, screen *ebiten.Image) {}

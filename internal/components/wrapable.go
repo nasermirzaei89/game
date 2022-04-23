@@ -1,5 +1,10 @@
 package components
 
-type Wrapable struct{}
+type Wrapable struct {
+	Horizontal bool
+	Vertical   bool
+}
 
-func (w *Wrapable) IsWrapable() {}
+func (w *Wrapable) GetWrapable() *Wrapable {
+	return w
+}

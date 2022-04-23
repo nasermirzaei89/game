@@ -2,30 +2,31 @@ package engine
 
 import (
 	"fmt"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/pkg/errors"
 )
 
 type Project struct {
-	objs   []Object
-	actors []Actor
+	objs   []Entity
+	actors []System
 }
 
 func NewProject() *Project {
 	p := Project{
-		objs:   make([]Object, 0),
-		actors: make([]Actor, 0),
+		objs:   make([]Entity, 0),
+		actors: make([]System, 0),
 	}
 
 	return &p
 }
 
-func (p *Project) Add(objs ...Object) {
+func (p *Project) Add(objs ...Entity) {
 	p.objs = append(p.objs, objs...)
 }
 
-func (p *Project) Register(actors ...Actor) {
+func (p *Project) Register(actors ...System) {
 	p.actors = append(p.actors, actors...)
 }
 
