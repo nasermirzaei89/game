@@ -15,8 +15,6 @@ type MovementController struct{}
 
 var _ engine.System = new(MovementController)
 
-func (mc *MovementController) Register(p *engine.Project) {}
-
 func (mc *MovementController) Update(e engine.Entity) error {
 	entity, ok := e.(MovementControllable)
 	if !ok {

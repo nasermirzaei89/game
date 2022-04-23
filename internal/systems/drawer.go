@@ -15,8 +15,6 @@ type Drawer struct{}
 
 var _ engine.System = new(Drawer)
 
-func (d *Drawer) Register(p *engine.Project) {}
-
 func (d *Drawer) Draw(e engine.Entity, screen *ebiten.Image) {
 	entity, ok := e.(Drawable)
 	if !ok {

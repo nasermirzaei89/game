@@ -14,8 +14,6 @@ type Transporter struct{}
 
 var _ engine.System = new(Transporter)
 
-func (t *Transporter) Register(p *engine.Project) {}
-
 func (t *Transporter) Update(obj engine.Entity) error {
 	entity, ok := obj.(Transportable)
 	if !ok {

@@ -2,7 +2,9 @@ package engine
 
 import "github.com/hajimehoshi/ebiten/v2"
 
-type System interface {
+type System interface{}
+
+type Registrable interface {
 	Register(p *Project)
 }
 

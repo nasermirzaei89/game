@@ -3,6 +3,7 @@ package game
 import (
 	"image"
 	"math/rand"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -82,16 +83,18 @@ func Run() error {
 		FrameTime: 0,
 	}
 
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+
 	for i := 0; i < 32; i++ {
 		project1.Add(
 			&Orbinaut{
 				Position: components.Position{
-					X: float64(rand.Intn(project1.ScreenWidth)),
-					Y: float64(rand.Intn(project1.ScreenHeight)),
+					X: float64(rnd.Intn(project1.ScreenWidth)),
+					Y: float64(rnd.Intn(project1.ScreenHeight)),
 				},
 				Velocity: components.Velocity{
-					Horizontal: float64(rand.Intn(10)) - 5,
-					Vertical:   float64(rand.Intn(10)) - 5,
+					Horizontal: float64(rnd.Intn(10)) - 5,
+					Vertical:   float64(rnd.Intn(10)) - 5,
 				},
 				Animation: orbinautAnimation,
 				Wrapable: components.Wrapable{
@@ -105,8 +108,8 @@ func Run() error {
 	project1.Add(
 		&BatBrain{
 			Position: components.Position{
-				X: float64(rand.Intn(project1.ScreenWidth)),
-				Y: float64(rand.Intn(project1.ScreenHeight)),
+				X: float64(rnd.Intn(project1.ScreenWidth)),
+				Y: float64(rnd.Intn(project1.ScreenHeight)),
 			},
 			MovementControl: components.MovementControl{
 				Up:    ebiten.KeyUp,

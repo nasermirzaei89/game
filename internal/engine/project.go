@@ -31,8 +31,14 @@ func (p *Project) Add(entities ...Entity) {
 
 func (p *Project) Register(systems ...System) {
 	for i := range systems {
-		systems[i].Register(p)
 		p.systems = append(p.systems, systems[i])
+
+		v, ok := p.systems[i].(Registrable)
+		if !ok {
+			continue
+		}
+
+		v.Register(p)
 	}
 }
 
@@ -48,12 +54,12 @@ func (p *Project) Run() error {
 func (p *Project) Update() error {
 	for i := range p.entities {
 		for j := range p.systems {
-			u, ok := p.systems[j].(Updatable)
+			v, ok := p.systems[j].(Updatable)
 			if !ok {
 				continue
 			}
 
-			err := u.Update(p.entities[i])
+			err := v.Update(p.entities[i])
 			if err != nil {
 				return errors.Wrap(err, "error on update object")
 			}
@@ -66,12 +72,12 @@ func (p *Project) Update() error {
 func (p *Project) Draw(screen *ebiten.Image) {
 	for i := range p.entities {
 		for j := range p.systems {
-			d, ok := p.systems[j].(Drawable)
+			v, ok := p.systems[j].(Drawable)
 			if !ok {
 				continue
 			}
 
-			d.Draw(p.entities[i], screen)
+			v.Draw(p.entities[i], screen)
 		}
 	}
 
