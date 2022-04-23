@@ -18,8 +18,10 @@ type Animator struct{}
 
 var _ engine.System = new(Animator)
 
-func (a *Animator) Update(obj engine.Entity) error {
-	entity, ok := obj.(Animation)
+func (a *Animator) Register(p *engine.Project) {}
+
+func (a *Animator) Update(e engine.Entity) error {
+	entity, ok := e.(Animation)
 	if !ok {
 		return nil
 	}
@@ -32,8 +34,8 @@ func (a *Animator) Update(obj engine.Entity) error {
 	return nil
 }
 
-func (a *Animator) Draw(obj engine.Entity, screen *ebiten.Image) {
-	entity, ok := obj.(Drawable)
+func (a *Animator) Draw(e engine.Entity, screen *ebiten.Image) {
+	entity, ok := e.(Drawable)
 	if !ok {
 		return
 	}

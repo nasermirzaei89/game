@@ -15,8 +15,10 @@ type MovementController struct{}
 
 var _ engine.System = new(MovementController)
 
-func (mc *MovementController) Update(obj engine.Entity) error {
-	entity, ok := obj.(MovementControllable)
+func (mc *MovementController) Register(p *engine.Project) {}
+
+func (mc *MovementController) Update(e engine.Entity) error {
+	entity, ok := e.(MovementControllable)
 	if !ok {
 		return nil
 	}
@@ -42,5 +44,3 @@ func (mc *MovementController) Update(obj engine.Entity) error {
 
 	return nil
 }
-
-func (mc *MovementController) Draw(obj engine.Entity, screen *ebiten.Image) {}

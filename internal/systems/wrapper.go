@@ -1,7 +1,6 @@
 package systems
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/nasermirzaei89/td/internal/components"
 	"github.com/nasermirzaei89/td/internal/engine"
 	"math"
@@ -12,9 +11,15 @@ type Wrapable interface {
 	GetWrapable() *components.Wrapable
 }
 
-type Wrapper struct{}
+type Wrapper struct {
+	project *engine.Project
+}
 
 var _ engine.System = new(Wrapper)
+
+func (w *Wrapper) Register(p *engine.Project) {
+	w.project = p
+}
 
 func (w *Wrapper) Update(obj engine.Entity) error {
 	entity, ok := obj.(Wrapable)
@@ -25,7 +30,7 @@ func (w *Wrapper) Update(obj engine.Entity) error {
 	position := entity.GetPosition()
 	wrapable := entity.GetWrapable()
 
-	width, height := ebiten.WindowSize()
+	width, height := w.project.ScreenWidth, w.project.ScreenHeight
 
 	if wrapable.Horizontal {
 		position.X = math.Mod(position.X+float64(width), float64(width))
@@ -37,5 +42,3 @@ func (w *Wrapper) Update(obj engine.Entity) error {
 
 	return nil
 }
-
-func (w *Wrapper) Draw(obj engine.Entity, screen *ebiten.Image) {}

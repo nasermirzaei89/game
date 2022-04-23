@@ -15,12 +15,10 @@ type Drawer struct{}
 
 var _ engine.System = new(Drawer)
 
-func (d *Drawer) Update(engine.Entity) error {
-	return nil
-}
+func (d *Drawer) Register(p *engine.Project) {}
 
-func (d *Drawer) Draw(obj engine.Entity, screen *ebiten.Image) {
-	entity, ok := obj.(Drawable)
+func (d *Drawer) Draw(e engine.Entity, screen *ebiten.Image) {
+	entity, ok := e.(Drawable)
 	if !ok {
 		return
 	}

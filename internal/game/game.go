@@ -22,8 +22,6 @@ func Run() error {
 		new(systems.Wrapper),
 	)
 
-	w, h := ebiten.WindowSize()
-
 	batBrainImg, _, err := ebitenutil.NewImageFromFile("./assets/bat-brain.png")
 	if err != nil {
 		return errors.Wrap(err, "error on new image from file")
@@ -115,8 +113,8 @@ func Run() error {
 		project1.Add(
 			&Orbinaut{
 				Position: components.Position{
-					X: float64(rand.Intn(w)),
-					Y: float64(rand.Intn(h)),
+					X: float64(rand.Intn(project1.ScreenWidth)),
+					Y: float64(rand.Intn(project1.ScreenHeight)),
 				},
 				Velocity: components.Velocity{
 					Horizontal: float64(rand.Intn(10)) - 5,
@@ -134,8 +132,8 @@ func Run() error {
 	project1.Add(
 		&BatBrain{
 			Position: components.Position{
-				X: float64(rand.Intn(w)),
-				Y: float64(rand.Intn(h)),
+				X: float64(rand.Intn(project1.ScreenWidth)),
+				Y: float64(rand.Intn(project1.ScreenHeight)),
 			},
 			MovementControl: components.MovementControl{
 				Up:    ebiten.KeyUp,

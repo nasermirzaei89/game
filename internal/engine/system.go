@@ -3,6 +3,13 @@ package engine
 import "github.com/hajimehoshi/ebiten/v2"
 
 type System interface {
-	Update(obj Entity) error
-	Draw(obj Entity, screen *ebiten.Image)
+	Register(p *Project)
+}
+
+type Updatable interface {
+	Update(entity Entity) error
+}
+
+type Drawable interface {
+	Draw(entity Entity, screen *ebiten.Image)
 }

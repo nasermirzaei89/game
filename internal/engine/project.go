@@ -9,25 +9,31 @@ import (
 )
 
 type Project struct {
-	objs   []Entity
-	actors []System
+	entities                  []Entity
+	systems                   []System
+	ScreenWidth, ScreenHeight int
 }
 
 func NewProject() *Project {
 	p := Project{
-		objs:   make([]Entity, 0),
-		actors: make([]System, 0),
+		entities:     make([]Entity, 0),
+		systems:      make([]System, 0),
+		ScreenWidth:  800,
+		ScreenHeight: 600,
 	}
 
 	return &p
 }
 
-func (p *Project) Add(objs ...Entity) {
-	p.objs = append(p.objs, objs...)
+func (p *Project) Add(entities ...Entity) {
+	p.entities = append(p.entities, entities...)
 }
 
-func (p *Project) Register(actors ...System) {
-	p.actors = append(p.actors, actors...)
+func (p *Project) Register(systems ...System) {
+	for i := range systems {
+		systems[i].Register(p)
+		p.systems = append(p.systems, systems[i])
+	}
 }
 
 func (p *Project) Run() error {
@@ -38,9 +44,14 @@ func (p *Project) Run() error {
 	return nil
 }
 func (p *Project) Update() error {
-	for i := range p.objs {
-		for j := range p.actors {
-			err := p.actors[j].Update(p.objs[i])
+	for i := range p.entities {
+		for j := range p.systems {
+			u, ok := p.systems[j].(Updatable)
+			if !ok {
+				continue
+			}
+
+			err := u.Update(p.entities[i])
 			if err != nil {
 				return errors.Wrap(err, "error on update object")
 			}
@@ -51,9 +62,14 @@ func (p *Project) Update() error {
 }
 
 func (p *Project) Draw(screen *ebiten.Image) {
-	for i := range p.objs {
-		for j := range p.actors {
-			p.actors[j].Draw(p.objs[i], screen)
+	for i := range p.entities {
+		for j := range p.systems {
+			d, ok := p.systems[j].(Drawable)
+			if !ok {
+				continue
+			}
+
+			d.Draw(p.entities[i], screen)
 		}
 	}
 
@@ -61,5 +77,8 @@ func (p *Project) Draw(screen *ebiten.Image) {
 }
 
 func (p *Project) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
+	p.ScreenWidth = outsideWidth
+	p.ScreenHeight = outsideHeight
+
 	return outsideWidth, outsideHeight
 }

@@ -1,7 +1,6 @@
 package systems
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/nasermirzaei89/td/internal/components"
 	"github.com/nasermirzaei89/td/internal/engine"
 )
@@ -14,6 +13,8 @@ type Transportable interface {
 type Transporter struct{}
 
 var _ engine.System = new(Transporter)
+
+func (t *Transporter) Register(p *engine.Project) {}
 
 func (t *Transporter) Update(obj engine.Entity) error {
 	entity, ok := obj.(Transportable)
@@ -29,5 +30,3 @@ func (t *Transporter) Update(obj engine.Entity) error {
 
 	return nil
 }
-
-func (t *Transporter) Draw(obj engine.Entity, screen *ebiten.Image) {}
