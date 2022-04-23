@@ -18,8 +18,8 @@ func NewProject() *Project {
 	p := Project{
 		entities:     make([]Entity, 0),
 		systems:      make([]System, 0),
-		ScreenWidth:  800,
-		ScreenHeight: 600,
+		ScreenWidth:  1366,
+		ScreenHeight: 768,
 	}
 
 	return &p
@@ -37,6 +37,8 @@ func (p *Project) Register(systems ...System) {
 }
 
 func (p *Project) Run() error {
+	ebiten.SetWindowSize(p.ScreenWidth, p.ScreenHeight)
+
 	if err := ebiten.RunGame(p); err != nil {
 		return errors.Wrap(err, "error on run game")
 	}

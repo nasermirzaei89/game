@@ -49,5 +49,5 @@ func (a *Animator) Draw(e engine.Entity, screen *ebiten.Image) {
 
 	ops.GeoM.Translate(position.X, position.Y)
 
-	screen.DrawImage(sprite.Image(), ops)
+	screen.DrawImage(sprite.Image, ops)
 }

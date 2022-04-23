@@ -1,6 +1,7 @@
 package game
 
 import (
+	"image"
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -35,38 +36,22 @@ func Run() error {
 	batBrainAnimation := components.Animation{
 		Frames: []*components.Sprite{
 			{
-				Source:  batBrainImg,
-				X0:      0,
-				X1:      40,
-				Y0:      0,
-				Y1:      40,
+				Image:   batBrainImg.SubImage(image.Rect(0, 0, 40, 40)).(*ebiten.Image),
 				OffsetX: 20,
 				OffsetY: 20,
 			},
 			{
-				Source:  batBrainImg,
-				X0:      40,
-				X1:      80,
-				Y0:      0,
-				Y1:      40,
+				Image:   batBrainImg.SubImage(image.Rect(40, 0, 80, 40)).(*ebiten.Image),
 				OffsetX: 20,
 				OffsetY: 20,
 			},
 			{
-				Source:  batBrainImg,
-				X0:      80,
-				X1:      120,
-				Y0:      0,
-				Y1:      40,
+				Image:   batBrainImg.SubImage(image.Rect(80, 0, 120, 40)).(*ebiten.Image),
 				OffsetX: 20,
 				OffsetY: 20,
 			},
 			{
-				Source:  batBrainImg,
-				X0:      40,
-				X1:      80,
-				Y0:      0,
-				Y1:      40,
+				Image:   batBrainImg.SubImage(image.Rect(40, 0, 80, 40)).(*ebiten.Image),
 				OffsetX: 20,
 				OffsetY: 20,
 			},
@@ -78,29 +63,17 @@ func Run() error {
 	orbinautAnimation := components.Animation{
 		Frames: []*components.Sprite{
 			{
-				Source:  orbinautImg,
-				X0:      0,
-				X1:      48,
-				Y0:      0,
-				Y1:      48,
+				Image:   orbinautImg.SubImage(image.Rect(0, 0, 48, 48)).(*ebiten.Image),
 				OffsetX: 24,
 				OffsetY: 24,
 			},
 			{
-				Source:  orbinautImg,
-				X0:      0,
-				X1:      48,
-				Y0:      48,
-				Y1:      96,
+				Image:   orbinautImg.SubImage(image.Rect(0, 48, 48, 96)).(*ebiten.Image),
 				OffsetX: 24,
 				OffsetY: 24,
 			},
 			{
-				Source:  orbinautImg,
-				X0:      0,
-				X1:      48,
-				Y0:      96,
-				Y1:      144,
+				Image:   orbinautImg.SubImage(image.Rect(0, 96, 48, 144)).(*ebiten.Image),
 				OffsetX: 24,
 				OffsetY: 24,
 			},
@@ -109,7 +82,7 @@ func Run() error {
 		FrameTime: 0,
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 32; i++ {
 		project1.Add(
 			&Orbinaut{
 				Position: components.Position{
