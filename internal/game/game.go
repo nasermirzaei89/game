@@ -24,12 +24,12 @@ func Run() error {
 
 	w, h := ebiten.WindowSize()
 
-	batBrainImg, _, err := ebitenutil.NewImageFromFile("/Users/nasermirzaei89/Projects/github.com/nasermirzaei89/td/assets/bat-brain.png")
+	batBrainImg, _, err := ebitenutil.NewImageFromFile("./assets/bat-brain.png")
 	if err != nil {
 		return errors.Wrap(err, "error on new image from file")
 	}
 
-	orbinautImg, _, err := ebitenutil.NewImageFromFile("/Users/nasermirzaei89/Projects/github.com/nasermirzaei89/td/assets/orbinaut.png")
+	orbinautImg, _, err := ebitenutil.NewImageFromFile("./assets/orbinaut.png")
 	if err != nil {
 		return errors.Wrap(err, "error on new image from file")
 	}
