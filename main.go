@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/nasermirzaei89/td/internal/game"
+	"github.com/nasermirzaei89/game/internal/game"
 	"github.com/pkg/errors"
 )
 

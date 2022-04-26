@@ -3,8 +3,8 @@ package systems
 import (
 	"math"
 
-	"github.com/nasermirzaei89/td/internal/components"
-	"github.com/nasermirzaei89/td/internal/engine"
+	"github.com/nasermirzaei89/game/internal/components"
+	"github.com/nasermirzaei89/game/internal/engine"
 )
 
 type Animation interface {

@@ -7,9 +7,9 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/nasermirzaei89/td/internal/components"
-	"github.com/nasermirzaei89/td/internal/engine"
-	"github.com/nasermirzaei89/td/internal/systems"
+	"github.com/nasermirzaei89/game/internal/components"
+	"github.com/nasermirzaei89/game/internal/engine"
+	"github.com/nasermirzaei89/game/internal/systems"
 	"github.com/pkg/errors"
 )
 
