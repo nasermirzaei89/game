@@ -1,23 +1,22 @@
 package systems
 
 import (
+	components2 "github.com/nasermirzaei89/game/internal/game1/components"
+	engine2 "github.com/nasermirzaei89/game/internal/game1/engine"
 	"math"
-
-	"github.com/nasermirzaei89/game/internal/components"
-	"github.com/nasermirzaei89/game/internal/engine"
 )
 
 type Animation interface {
-	GetPosition() *components.Position
-	GetSprite() *components.Sprite
-	GetAnimation() *components.Animation
+	GetPosition() *components2.Position
+	GetSprite() *components2.Sprite
+	GetAnimation() *components2.Animation
 }
 
 type Animator struct{}
 
-var _ engine.System = new(Animator)
+var _ engine2.System = new(Animator)
 
-func (a *Animator) Update(e engine.Entity) error {
+func (a *Animator) Update(e engine2.Entity) error {
 	entity, ok := e.(Animation)
 	if !ok {
 		return nil

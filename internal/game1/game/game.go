@@ -1,15 +1,15 @@
 package game
 
 import (
+	components2 "github.com/nasermirzaei89/game/internal/game1/components"
+	"github.com/nasermirzaei89/game/internal/game1/engine"
+	systems2 "github.com/nasermirzaei89/game/internal/game1/systems"
 	"image"
 	"math/rand"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/nasermirzaei89/game/internal/components"
-	"github.com/nasermirzaei89/game/internal/engine"
-	"github.com/nasermirzaei89/game/internal/systems"
 	"github.com/pkg/errors"
 )
 
@@ -17,11 +17,11 @@ func Run() error {
 	project1 := engine.NewProject()
 
 	project1.Register(
-		new(systems.Animator),
-		new(systems.Drawer),
-		new(systems.MovementController),
-		new(systems.Transporter),
-		new(systems.Wrapper),
+		new(systems2.Animator),
+		new(systems2.Drawer),
+		new(systems2.MovementController),
+		new(systems2.Transporter),
+		new(systems2.Wrapper),
 	)
 
 	batBrainImg, _, err := ebitenutil.NewImageFromFile("./assets/bat-brain.png")
@@ -34,8 +34,8 @@ func Run() error {
 		return errors.Wrap(err, "error on new image from file")
 	}
 
-	batBrainAnimation := components.Animation{
-		Frames: []*components.Sprite{
+	batBrainAnimation := components2.Animation{
+		Frames: []*components2.Sprite{
 			{
 				Image:   batBrainImg.SubImage(image.Rect(0, 0, 40, 40)).(*ebiten.Image),
 				OffsetX: 20,
@@ -61,8 +61,8 @@ func Run() error {
 		FrameTime: 0,
 	}
 
-	orbinautAnimation := components.Animation{
-		Frames: []*components.Sprite{
+	orbinautAnimation := components2.Animation{
+		Frames: []*components2.Sprite{
 			{
 				Image:   orbinautImg.SubImage(image.Rect(0, 0, 48, 48)).(*ebiten.Image),
 				OffsetX: 24,
@@ -88,16 +88,16 @@ func Run() error {
 	for i := 0; i < 32; i++ {
 		project1.Add(
 			&Orbinaut{
-				Position: components.Position{
+				Position: components2.Position{
 					X: float64(rnd.Intn(project1.ScreenWidth)),
 					Y: float64(rnd.Intn(project1.ScreenHeight)),
 				},
-				Velocity: components.Velocity{
+				Velocity: components2.Velocity{
 					Horizontal: float64(rnd.Intn(10)) - 5,
 					Vertical:   float64(rnd.Intn(10)) - 5,
 				},
 				Animation: orbinautAnimation,
-				Wrapable: components.Wrapable{
+				Wrapable: components2.Wrapable{
 					Horizontal: true,
 					Vertical:   true,
 				},
@@ -107,18 +107,18 @@ func Run() error {
 
 	project1.Add(
 		&BatBrain{
-			Position: components.Position{
+			Position: components2.Position{
 				X: float64(rnd.Intn(project1.ScreenWidth)),
 				Y: float64(rnd.Intn(project1.ScreenHeight)),
 			},
-			MovementControl: components.MovementControl{
+			MovementControl: components2.MovementControl{
 				Up:    ebiten.KeyUp,
 				Down:  ebiten.KeyDown,
 				Left:  ebiten.KeyLeft,
 				Right: ebiten.KeyRight,
 			},
 			Animation: batBrainAnimation,
-			Wrapable: components.Wrapable{
+			Wrapable: components2.Wrapable{
 				Horizontal: true,
 				Vertical:   true,
 			},

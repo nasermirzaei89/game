@@ -2,20 +2,20 @@ package systems
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/nasermirzaei89/game/internal/components"
-	"github.com/nasermirzaei89/game/internal/engine"
+	components2 "github.com/nasermirzaei89/game/internal/game1/components"
+	engine2 "github.com/nasermirzaei89/game/internal/game1/engine"
 )
 
 type MovementControllable interface {
-	GetPosition() *components.Position
-	GetMovementControl() *components.MovementControl
+	GetPosition() *components2.Position
+	GetMovementControl() *components2.MovementControl
 }
 
 type MovementController struct{}
 
-var _ engine.System = new(MovementController)
+var _ engine2.System = new(MovementController)
 
-func (mc *MovementController) Update(e engine.Entity) error {
+func (mc *MovementController) Update(e engine2.Entity) error {
 	entity, ok := e.(MovementControllable)
 	if !ok {
 		return nil

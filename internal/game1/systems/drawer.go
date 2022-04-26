@@ -2,20 +2,20 @@ package systems
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/nasermirzaei89/game/internal/components"
-	"github.com/nasermirzaei89/game/internal/engine"
+	components2 "github.com/nasermirzaei89/game/internal/game1/components"
+	engine2 "github.com/nasermirzaei89/game/internal/game1/engine"
 )
 
 type Drawable interface {
-	GetPosition() *components.Position
-	GetSprite() *components.Sprite
+	GetPosition() *components2.Position
+	GetSprite() *components2.Sprite
 }
 
 type Drawer struct{}
 
-var _ engine.System = new(Drawer)
+var _ engine2.System = new(Drawer)
 
-func (d *Drawer) Draw(e engine.Entity, screen *ebiten.Image) {
+func (d *Drawer) Draw(e engine2.Entity, screen *ebiten.Image) {
 	entity, ok := e.(Drawable)
 	if !ok {
 		return

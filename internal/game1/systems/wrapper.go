@@ -1,27 +1,27 @@
 package systems
 
 import (
-	"github.com/nasermirzaei89/game/internal/components"
-	"github.com/nasermirzaei89/game/internal/engine"
+	components2 "github.com/nasermirzaei89/game/internal/game1/components"
+	engine2 "github.com/nasermirzaei89/game/internal/game1/engine"
 	"math"
 )
 
 type Wrapable interface {
-	GetPosition() *components.Position
-	GetWrapable() *components.Wrapable
+	GetPosition() *components2.Position
+	GetWrapable() *components2.Wrapable
 }
 
 type Wrapper struct {
-	project *engine.Project
+	project *engine2.Project
 }
 
-var _ engine.System = new(Wrapper)
+var _ engine2.System = new(Wrapper)
 
-func (w *Wrapper) Register(p *engine.Project) {
+func (w *Wrapper) Register(p *engine2.Project) {
 	w.project = p
 }
 
-func (w *Wrapper) Update(obj engine.Entity) error {
+func (w *Wrapper) Update(obj engine2.Entity) error {
 	entity, ok := obj.(Wrapable)
 	if !ok {
 		return nil
