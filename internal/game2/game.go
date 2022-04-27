@@ -8,15 +8,19 @@ import (
 
 type Game interface {
 	Run() error
+
 	EventManager
 
 	AddObject(obj Object)
 	RemoveObject(obj Object)
 
-	OnDraw(action func(ev *EventDraw))
-	OnUpdate(action func(ev *EventUpdate))
+	HierarchicalEmit(eventName EventName, f func() Event)
+
 	OnStart(action func(ev *EventGameStart))
 	OnEnd(action func(ev *EventGameEnd))
+
+	ScreenWidth() int
+	ScreenHeight() int
 }
 
 type game struct {
@@ -24,6 +28,8 @@ type game struct {
 	buffer  []Object
 	objects []Object
 	started bool
+
+	screenWidth, screenHeight int
 }
 
 var _ ebiten.Game = new(game)
@@ -39,7 +45,7 @@ func (g *game) Run() error {
 }
 
 func (g *game) Update() error {
-	g.Emit(EventNameUpdate, func() Event {
+	g.HierarchicalEmit(EventNameUpdate, func() Event {
 		return &EventUpdate{}
 	})
 
@@ -63,7 +69,7 @@ func (g *game) Update() error {
 
 	g.buffer = make([]Object, 0)
 
-	g.Emit(EventNameMouseGlobalLeftDown, func() Event {
+	g.HierarchicalEmit(EventNameMouseGlobalLeftDown, func() Event {
 		if !ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 			return nil
 		}
@@ -76,7 +82,7 @@ func (g *game) Update() error {
 		}
 	})
 
-	g.Emit(EventNameMouseGlobalRightDown, func() Event {
+	g.HierarchicalEmit(EventNameMouseGlobalRightDown, func() Event {
 		if !ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
 			return nil
 		}
@@ -89,7 +95,7 @@ func (g *game) Update() error {
 		}
 	})
 
-	g.Emit(EventNameMouseGlobalMiddleDown, func() Event {
+	g.HierarchicalEmit(EventNameMouseGlobalMiddleDown, func() Event {
 		if !ebiten.IsMouseButtonPressed(ebiten.MouseButtonMiddle) {
 			return nil
 		}
@@ -102,7 +108,7 @@ func (g *game) Update() error {
 		}
 	})
 
-	g.Emit(EventNameMouseGlobalLeftPressed, func() Event {
+	g.HierarchicalEmit(EventNameMouseGlobalLeftPressed, func() Event {
 		if !inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 			return nil
 		}
@@ -115,7 +121,7 @@ func (g *game) Update() error {
 		}
 	})
 
-	g.Emit(EventNameMouseGlobalRightPressed, func() Event {
+	g.HierarchicalEmit(EventNameMouseGlobalRightPressed, func() Event {
 		if !inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
 			return nil
 		}
@@ -128,7 +134,7 @@ func (g *game) Update() error {
 		}
 	})
 
-	g.Emit(EventNameMouseGlobalMiddlePressed, func() Event {
+	g.HierarchicalEmit(EventNameMouseGlobalMiddlePressed, func() Event {
 		if !inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonMiddle) {
 			return nil
 		}
@@ -141,7 +147,7 @@ func (g *game) Update() error {
 		}
 	})
 
-	g.Emit(EventNameMouseGlobalLeftReleased, func() Event {
+	g.HierarchicalEmit(EventNameMouseGlobalLeftReleased, func() Event {
 		if !inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
 			return nil
 		}
@@ -154,7 +160,7 @@ func (g *game) Update() error {
 		}
 	})
 
-	g.Emit(EventNameMouseGlobalRightReleased, func() Event {
+	g.HierarchicalEmit(EventNameMouseGlobalRightReleased, func() Event {
 		if !inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonRight) {
 			return nil
 		}
@@ -167,7 +173,7 @@ func (g *game) Update() error {
 		}
 	})
 
-	g.Emit(EventNameMouseGlobalMiddleReleased, func() Event {
+	g.HierarchicalEmit(EventNameMouseGlobalMiddleReleased, func() Event {
 		if !inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonMiddle) {
 			return nil
 		}
@@ -178,6 +184,38 @@ func (g *game) Update() error {
 			MouseX: x,
 			MouseY: y,
 		}
+	})
+
+	g.HierarchicalEmit(EventNameKeyDownLeft, func() Event {
+		if !ebiten.IsKeyPressed(ebiten.KeyLeft) {
+			return nil
+		}
+
+		return &EventKeyDownLeft{}
+	})
+
+	g.HierarchicalEmit(EventNameKeyDownRight, func() Event {
+		if !ebiten.IsKeyPressed(ebiten.KeyRight) {
+			return nil
+		}
+
+		return &EventKeyDownRight{}
+	})
+
+	g.HierarchicalEmit(EventNameKeyDownUp, func() Event {
+		if !ebiten.IsKeyPressed(ebiten.KeyUp) {
+			return nil
+		}
+
+		return &EventKeyDownUp{}
+	})
+
+	g.HierarchicalEmit(EventNameKeyDownDown, func() Event {
+		if !ebiten.IsKeyPressed(ebiten.KeyDown) {
+			return nil
+		}
+
+		return &EventKeyDownDown{}
 	})
 
 	g.Emit(EventNameGameEnd, func() Event {
@@ -192,18 +230,15 @@ func (g *game) Update() error {
 }
 
 func (g *game) Draw(screen *ebiten.Image) {
-	g.Emit(EventNameDraw, func() Event {
+	g.HierarchicalEmit(EventNameDraw, func() Event {
 		return &EventDraw{Screen: screen}
 	})
-
-	for i := range g.objects {
-		g.objects[i].Emit(EventNameDraw, func() Event {
-			return &EventDraw{Screen: screen}
-		})
-	}
 }
 
 func (g *game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
+	g.screenWidth = outsideWidth
+	g.screenHeight = outsideHeight
+
 	return outsideWidth, outsideHeight
 }
 
@@ -225,20 +260,20 @@ func (g *game) RemoveObject(obj Object) {
 	}
 }
 
-func (g *game) OnDraw(action func(*EventDraw)) {
-	g.On(EventNameDraw, func(event Event) {
-		eventDraw, _ := event.(*EventDraw)
+func (g *game) HierarchicalEmit(eventName EventName, f func() Event) {
+	g.Emit(eventName, f)
 
-		action(eventDraw)
-	})
+	for i := range g.objects {
+		g.objects[i].Emit(eventName, f)
+	}
 }
 
-func (g *game) OnUpdate(action func(*EventUpdate)) {
-	g.On(EventNameUpdate, func(event Event) {
-		eventUpdate, _ := event.(*EventUpdate)
+func (g *game) ScreenWidth() int {
+	return g.screenWidth
+}
 
-		action(eventUpdate)
-	})
+func (g *game) ScreenHeight() int {
+	return g.screenHeight
 }
 
 func (g *game) OnStart(action func(*EventGameStart)) {
@@ -259,7 +294,12 @@ func (g *game) OnEnd(action func(*EventGameEnd)) {
 
 func NewGame() Game {
 	g := &game{
-		started: false,
+		eventManager: eventManager{},
+		buffer:       make([]Object, 0),
+		objects:      make([]Object, 0),
+		started:      false,
+		screenWidth:  0,
+		screenHeight: 0,
 	}
 
 	return g
