@@ -26,16 +26,16 @@ func main() {
 
 	frame := 0
 
-	g.On(game2.EventNameGameStart, func(ev game2.Event) {
+	g.OnStart(func(ev *game2.EventGameStart) {
 		log.Println(ev.Name())
 	})
 
-	g.On(game2.EventNameGameEnd, func(ev game2.Event) {
+	g.OnEnd(func(ev *game2.EventGameEnd) {
 		log.Println(ev.Name())
 	})
 
-	g.On(game2.EventNameMouseLeftJustPress, func(ev game2.Event) {
-		eventGlobalClick, _ := ev.(*game2.EventMouseLeftJustPress)
+	g.On(game2.EventNameMouseGlobalLeftPressed, func(ev game2.Event) {
+		eventGlobalClick, _ := ev.(*game2.EventMouseGlobalLeftPressed)
 
 		d.bound.Min.X = eventGlobalClick.MouseX
 		d.bound.Min.Y = eventGlobalClick.MouseY
@@ -43,18 +43,18 @@ func main() {
 		d.active = true
 	})
 
-	g.On(game2.EventNameMouseLeftPress, func(ev game2.Event) {
-		eventGlobalClick, _ := ev.(*game2.EventMouseLeftPress)
+	g.On(game2.EventNameMouseGlobalLeftDown, func(ev game2.Event) {
+		eventGlobalClick, _ := ev.(*game2.EventMouseGlobalLeftDown)
 
 		d.bound.Max.X = eventGlobalClick.MouseX
 		d.bound.Max.Y = eventGlobalClick.MouseY
 	})
 
-	g.On(game2.EventNameMouseLeftJustRelease, func(ev game2.Event) {
+	g.On(game2.EventNameMouseGlobalLeftReleased, func(ev game2.Event) {
 		d.active = false
 	})
 
-	g.OnUpdate(func() {
+	g.OnUpdate(func(ev *game2.EventUpdate) {
 		frame++
 
 		if frame == 100 {

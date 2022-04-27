@@ -9,10 +9,14 @@ import (
 type Game interface {
 	Run() error
 	EventManager
-	OnDraw(action func(ev *EventDraw))
-	OnUpdate(action func())
+
 	AddObject(obj Object)
 	RemoveObject(obj Object)
+
+	OnDraw(action func(ev *EventDraw))
+	OnUpdate(action func(ev *EventUpdate))
+	OnStart(action func(ev *EventGameStart))
+	OnEnd(action func(ev *EventGameEnd))
 }
 
 type game struct {
@@ -59,40 +63,118 @@ func (g *game) Update() error {
 
 	g.buffer = make([]Object, 0)
 
-	g.Emit(EventNameMouseLeftPress, func() Event {
+	g.Emit(EventNameMouseGlobalLeftDown, func() Event {
 		if !ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 			return nil
 		}
 
 		x, y := ebiten.CursorPosition()
 
-		return &EventMouseLeftPress{
+		return &EventMouseGlobalLeftDown{
 			MouseX: x,
 			MouseY: y,
 		}
 	})
 
-	g.Emit(EventNameMouseLeftJustPress, func() Event {
+	g.Emit(EventNameMouseGlobalRightDown, func() Event {
+		if !ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+			return nil
+		}
+
+		x, y := ebiten.CursorPosition()
+
+		return &EventMouseGlobalRightDown{
+			MouseX: x,
+			MouseY: y,
+		}
+	})
+
+	g.Emit(EventNameMouseGlobalMiddleDown, func() Event {
+		if !ebiten.IsMouseButtonPressed(ebiten.MouseButtonMiddle) {
+			return nil
+		}
+
+		x, y := ebiten.CursorPosition()
+
+		return &EventMouseGlobalMiddleDown{
+			MouseX: x,
+			MouseY: y,
+		}
+	})
+
+	g.Emit(EventNameMouseGlobalLeftPressed, func() Event {
 		if !inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 			return nil
 		}
 
 		x, y := ebiten.CursorPosition()
 
-		return &EventMouseLeftJustPress{
+		return &EventMouseGlobalLeftPressed{
 			MouseX: x,
 			MouseY: y,
 		}
 	})
 
-	g.Emit(EventNameMouseLeftJustRelease, func() Event {
+	g.Emit(EventNameMouseGlobalRightPressed, func() Event {
+		if !inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
+			return nil
+		}
+
+		x, y := ebiten.CursorPosition()
+
+		return &EventMouseGlobalRightPressed{
+			MouseX: x,
+			MouseY: y,
+		}
+	})
+
+	g.Emit(EventNameMouseGlobalMiddlePressed, func() Event {
+		if !inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonMiddle) {
+			return nil
+		}
+
+		x, y := ebiten.CursorPosition()
+
+		return &EventMouseGlobalMiddlePressed{
+			MouseX: x,
+			MouseY: y,
+		}
+	})
+
+	g.Emit(EventNameMouseGlobalLeftReleased, func() Event {
 		if !inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
 			return nil
 		}
 
 		x, y := ebiten.CursorPosition()
 
-		return &EventMouseLeftJustRelease{
+		return &EventMouseGlobalLeftReleased{
+			MouseX: x,
+			MouseY: y,
+		}
+	})
+
+	g.Emit(EventNameMouseGlobalRightReleased, func() Event {
+		if !inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonRight) {
+			return nil
+		}
+
+		x, y := ebiten.CursorPosition()
+
+		return &EventMouseGlobalRightReleased{
+			MouseX: x,
+			MouseY: y,
+		}
+	})
+
+	g.Emit(EventNameMouseGlobalMiddleReleased, func() Event {
+		if !inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonMiddle) {
+			return nil
+		}
+
+		x, y := ebiten.CursorPosition()
+
+		return &EventMouseGlobalMiddleReleased{
 			MouseX: x,
 			MouseY: y,
 		}
@@ -143,7 +225,7 @@ func (g *game) RemoveObject(obj Object) {
 	}
 }
 
-func (g *game) OnDraw(action func(ev *EventDraw)) {
+func (g *game) OnDraw(action func(*EventDraw)) {
 	g.On(EventNameDraw, func(event Event) {
 		eventDraw, _ := event.(*EventDraw)
 
@@ -151,9 +233,27 @@ func (g *game) OnDraw(action func(ev *EventDraw)) {
 	})
 }
 
-func (g *game) OnUpdate(action func()) {
+func (g *game) OnUpdate(action func(*EventUpdate)) {
 	g.On(EventNameUpdate, func(event Event) {
-		action()
+		eventUpdate, _ := event.(*EventUpdate)
+
+		action(eventUpdate)
+	})
+}
+
+func (g *game) OnStart(action func(*EventGameStart)) {
+	g.On(EventNameGameStart, func(event Event) {
+		eventGameStart, _ := event.(*EventGameStart)
+
+		action(eventGameStart)
+	})
+}
+
+func (g *game) OnEnd(action func(*EventGameEnd)) {
+	g.On(EventNameGameEnd, func(event Event) {
+		eventGameEnd, _ := event.(*EventGameEnd)
+
+		action(eventGameEnd)
 	})
 }
 
