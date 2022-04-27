@@ -7,6 +7,8 @@ type EventName string
 const (
 	EventNameGameStart            EventName = "gameStart"
 	EventNameGameEnd              EventName = "gameEnd"
+	EventNameCreate               EventName = "create"
+	EventNameDestroy              EventName = "destroy"
 	EventNameMouseLeftPress       EventName = "mouseLeftPress"
 	EventNameMouseLeftJustPress   EventName = "mouseLeftJustPress"
 	EventNameMouseLeftJustRelease EventName = "mouseLeftJustRelease"
@@ -18,10 +20,76 @@ type Event interface {
 	Name() EventName
 }
 
+type EventManager interface {
+	On(event EventName, action EventListener)
+	Emit(eventName EventName, f func() Event)
+}
+
+type eventManager struct {
+	eventMap map[EventName][]EventListener
+}
+
+func (em *eventManager) On(event EventName, action EventListener) {
+	if em.eventMap == nil {
+		em.eventMap = make(map[EventName][]EventListener)
+	}
+
+	if _, ok := em.eventMap[event]; !ok {
+		em.eventMap[event] = make([]EventListener, 0)
+	}
+
+	em.eventMap[event] = append(em.eventMap[event], action)
+}
+
+func (em *eventManager) Emit(eventName EventName, f func() Event) {
+	if listeners, ok := em.eventMap[eventName]; ok {
+		if len(listeners) == 0 {
+			return
+		}
+
+		ev := f()
+		if ev == nil {
+			return
+		}
+
+		for i := range listeners {
+			listeners[i](ev)
+		}
+	}
+}
+
 type EventListener func(event Event)
 
 type EventMouseLeftPress struct {
 	MouseX, MouseY int
+}
+
+type EventGameStart struct{}
+
+func (event EventGameStart) Name() EventName {
+	return EventNameGameStart
+}
+
+type EventGameEnd struct{}
+
+func (event EventGameEnd) Name() EventName {
+	return EventNameGameEnd
+}
+
+type EventCreate struct {
+	Object Object
+}
+
+func (event EventCreate) Name() EventName {
+	return EventNameCreate
+}
+
+type EventDestroy struct {
+	Object Object
+}
+
+func (event EventDestroy) Name() EventName {
+	return EventNameDestroy
 }
 
 func (event EventMouseLeftPress) Name() EventName {
@@ -56,16 +124,4 @@ type EventUpdate struct{}
 
 func (event EventUpdate) Name() EventName {
 	return EventNameUpdate
-}
-
-type EventGameStart struct{}
-
-func (event EventGameStart) Name() EventName {
-	return EventNameGameStart
-}
-
-type EventGameEnd struct{}
-
-func (event EventGameEnd) Name() EventName {
-	return EventNameGameEnd
 }

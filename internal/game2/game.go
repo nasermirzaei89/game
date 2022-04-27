@@ -8,14 +8,18 @@ import (
 
 type Game interface {
 	Run() error
-	On(event EventName, action EventListener)
+	EventManager
 	OnDraw(action func(ev *EventDraw))
 	OnUpdate(action func())
+	AddObject(obj Object)
+	RemoveObject(obj Object)
 }
 
 type game struct {
-	eventMap map[EventName][]EventListener
-	started  bool
+	eventManager
+	buffer  []Object
+	objects []Object
+	started bool
 }
 
 var _ ebiten.Game = new(game)
@@ -44,6 +48,16 @@ func (g *game) Update() error {
 
 		return nil
 	})
+
+	for i := range g.buffer {
+		g.objects = append(g.objects, g.buffer[i])
+
+		g.buffer[i].Emit(EventNameCreate, func() Event {
+			return &EventCreate{Object: g.buffer[i]}
+		})
+	}
+
+	g.buffer = make([]Object, 0)
 
 	g.Emit(EventNameMouseLeftPress, func() Event {
 		if !ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
@@ -99,23 +113,39 @@ func (g *game) Draw(screen *ebiten.Image) {
 	g.Emit(EventNameDraw, func() Event {
 		return &EventDraw{Screen: screen}
 	})
+
+	for i := range g.objects {
+		g.objects[i].Emit(EventNameDraw, func() Event {
+			return &EventDraw{Screen: screen}
+		})
+	}
 }
 
 func (g *game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return outsideWidth, outsideHeight
 }
 
-func (g *game) On(event EventName, action EventListener) {
-	if _, ok := g.eventMap[event]; !ok {
-		g.eventMap[event] = make([]EventListener, 0)
-	}
+func (g *game) AddObject(obj Object) {
+	g.buffer = append(g.buffer, obj)
+}
 
-	g.eventMap[event] = append(g.eventMap[event], action)
+func (g *game) RemoveObject(obj Object) {
+	obj.Emit(EventNameDestroy, func() Event {
+		return &EventDestroy{Object: obj}
+	})
+
+	for i := range g.objects {
+		if obj == g.objects[i] {
+			g.objects = append(g.objects[:i], g.objects[i+1:]...)
+
+			return
+		}
+	}
 }
 
 func (g *game) OnDraw(action func(ev *EventDraw)) {
 	g.On(EventNameDraw, func(event Event) {
-		eventDraw := event.(*EventDraw)
+		eventDraw, _ := event.(*EventDraw)
 
 		action(eventDraw)
 	})
@@ -127,27 +157,9 @@ func (g *game) OnUpdate(action func()) {
 	})
 }
 
-func (g *game) Emit(eventName EventName, f func() Event) {
-	if listeners, ok := g.eventMap[eventName]; ok {
-		if len(listeners) == 0 {
-			return
-		}
-
-		ev := f()
-		if ev == nil {
-			return
-		}
-
-		for i := range listeners {
-			listeners[i](ev)
-		}
-	}
-}
-
 func NewGame() Game {
 	g := &game{
-		eventMap: make(map[EventName][]EventListener),
-		started:  false,
+		started: false,
 	}
 
 	return g

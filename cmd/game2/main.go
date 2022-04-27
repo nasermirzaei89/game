@@ -12,6 +12,7 @@ import (
 )
 
 type drawer struct {
+	game2.BaseObject
 	bound  image.Rectangle
 	active bool
 }
@@ -19,18 +20,22 @@ type drawer struct {
 func main() {
 	g := game2.NewGame()
 
-	g.On(game2.EventNameGameStart, func(_ game2.Event) {
-		log.Println("Game Started!")
-	})
-
-	g.On(game2.EventNameGameEnd, func(_ game2.Event) {
-		log.Println("Game Ended!")
-	})
-
 	d := new(drawer)
 
+	g.AddObject(d)
+
+	frame := 0
+
+	g.On(game2.EventNameGameStart, func(ev game2.Event) {
+		log.Println(ev.Name())
+	})
+
+	g.On(game2.EventNameGameEnd, func(ev game2.Event) {
+		log.Println(ev.Name())
+	})
+
 	g.On(game2.EventNameMouseLeftJustPress, func(ev game2.Event) {
-		eventGlobalClick := ev.(*game2.EventMouseLeftJustPress)
+		eventGlobalClick, _ := ev.(*game2.EventMouseLeftJustPress)
 
 		d.bound.Min.X = eventGlobalClick.MouseX
 		d.bound.Min.Y = eventGlobalClick.MouseY
@@ -39,7 +44,7 @@ func main() {
 	})
 
 	g.On(game2.EventNameMouseLeftPress, func(ev game2.Event) {
-		eventGlobalClick := ev.(*game2.EventMouseLeftPress)
+		eventGlobalClick, _ := ev.(*game2.EventMouseLeftPress)
 
 		d.bound.Max.X = eventGlobalClick.MouseX
 		d.bound.Max.Y = eventGlobalClick.MouseY
@@ -49,13 +54,19 @@ func main() {
 		d.active = false
 	})
 
-	frame := 0
-
 	g.OnUpdate(func() {
 		frame++
+
+		if frame == 100 {
+			g.RemoveObject(d)
+		}
 	})
 
 	g.OnDraw(func(ev *game2.EventDraw) {
+		ebitenutil.DebugPrint(ev.Screen, fmt.Sprintf("Frame %d", frame))
+	})
+
+	d.OnDraw(func(ev *game2.EventDraw) {
 		if !d.active {
 			return
 		}
@@ -63,8 +74,12 @@ func main() {
 		ebitenutil.DrawRect(ev.Screen, float64(d.bound.Min.X), float64(d.bound.Min.Y), float64(d.bound.Size().X), float64(d.bound.Size().Y), color.White)
 	})
 
-	g.OnDraw(func(ev *game2.EventDraw) {
-		ebitenutil.DebugPrint(ev.Screen, fmt.Sprintf("Frame %d", frame))
+	d.OnCreate(func(ev *game2.EventCreate) {
+		log.Println(ev.Name())
+	})
+
+	d.OnDestroy(func(ev *game2.EventDestroy) {
+		log.Println(ev.Name())
 	})
 
 	if err := g.Run(); err != nil {
