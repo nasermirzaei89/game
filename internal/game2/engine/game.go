@@ -1,4 +1,4 @@
-package game2
+package engine
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
@@ -10,6 +10,7 @@ type Game interface {
 	Run() error
 
 	EventManager
+	ImageManager
 
 	AddObject(obj Object)
 	RemoveObject(obj Object)
@@ -25,11 +26,13 @@ type Game interface {
 
 type game struct {
 	eventManager
+	imageManager
 	buffer  []Object
 	objects []Object
 	started bool
 
 	screenWidth, screenHeight int
+	title                     string
 }
 
 var _ ebiten.Game = new(game)
@@ -37,6 +40,8 @@ var _ ebiten.Game = new(game)
 var _ Game = new(game)
 
 func (g *game) Run() error {
+	ebiten.SetWindowTitle(g.title)
+
 	if err := ebiten.RunGame(g); err != nil {
 		return errors.Wrap(err, "error on run ebiten game")
 	}
@@ -292,15 +297,10 @@ func (g *game) OnEnd(action func(*EventGameEnd)) {
 	})
 }
 
-func NewGame() Game {
-	g := &game{
-		eventManager: eventManager{},
-		buffer:       make([]Object, 0),
-		objects:      make([]Object, 0),
-		started:      false,
-		screenWidth:  0,
-		screenHeight: 0,
-	}
+func NewGame(title string) Game {
+	g := new(game)
+
+	g.title = title
 
 	return g
 }

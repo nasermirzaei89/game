@@ -1,4 +1,4 @@
-package game2
+package engine
 
 const (
 	EventNameCreate  EventName = "create"
